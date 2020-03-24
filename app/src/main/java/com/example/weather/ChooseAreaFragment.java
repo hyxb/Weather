@@ -3,6 +3,7 @@ package com.example.weather;
 import android.app.ProgressDialog;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +18,7 @@ import com.example.weather.db.City;
 import com.example.weather.db.County;
 import com.example.weather.db.Province;
 import com.example.weather.util.HttpUtil;
+import com.example.weather.util.LogUtil;
 import com.example.weather.util.Utility;
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -73,12 +75,15 @@ public class ChooseAreaFragment extends Fragment {
         listView = (ListView) view.findViewById(R.id.list_view);
         adapter = new ArrayAdapter<>(getContext(),android.R.layout.simple_list_item_1,dataList);
         listView.setAdapter(adapter);
+        LogUtil.logInfo("onCreateView is Running");
         return view;
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        LogUtil.logInfo("onActivityCreated is Running");
+
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener(){
 
             @Override
@@ -104,13 +109,16 @@ public class ChooseAreaFragment extends Fragment {
                 }
             }
         });
+
         queryProvinces();
+        LogUtil.logInfo("第一次查询省级数据");
     }
 
     /**
      * 查询全国省份，优先数据库，然后服务器
      */
     private void queryProvinces(){
+        LogUtil.logInfo("查询省份信息");
         titleText.setText("中国");
         backButton.setVisibility(View.GONE);
         provinceList = DataSupport.findAll(Province.class);
@@ -123,7 +131,7 @@ public class ChooseAreaFragment extends Fragment {
             listView.setSelection(0);
             currentLevel =LEVEL_PROVINCE;
         }else {
-            String address = "http://guolin.tech/api/china";
+            String address = "http://guolin.tech/api/china/";
             queryFromServer(address,"province");
         }
     }
@@ -132,12 +140,19 @@ public class ChooseAreaFragment extends Fragment {
      * 查询省内市，优先数据库，然后服务器
      */
     private void queryCities(){
+        LogUtil.logInfo("查询城市信息");
         titleText.setText(selectedProvince.getProvincename());
         backButton.setVisibility(View.VISIBLE);
-        cityList = DataSupport.where("provinceid = ?",String.valueOf(selectedProvince.getId())).find(City.class);
+        cityList = DataSupport.where("provinceId = ?",String.valueOf(selectedProvince.getId())).find(City.class);
+//        cityList = DataSupport.where("provinceId = 9").find(City.class);
+
+        LogUtil.logDebug(String.valueOf(selectedProvince.getId()));
+//        LogUtil.logDebug(String.valueOf(cityList.size()));
+//        LogUtil.logDebug(this.cityList.toString());
+
         if (cityList.size() > 0){
             dataList.clear();
-            for(City city:cityList){
+            for(City city: this.cityList){
                 dataList.add(city.getCityName());
             }
             adapter.notifyDataSetChanged();
@@ -145,7 +160,11 @@ public class ChooseAreaFragment extends Fragment {
             currentLevel = LEVEL_CITY;
         }else {
             int provinceCode = selectedProvince.getProvinceCode();
-            String address    = "https://guolin.tech/api/china/"+provinceCode;
+            String address;
+            if (provinceCode <= 6){
+                address = "http://guolin.tech/api/china/"+provinceCode+"/"+provinceCode;
+            }
+            address = "http://guolin.tech/api/china/"+provinceCode;
             queryFromServer(address,"city");
         }
     }
@@ -154,9 +173,12 @@ public class ChooseAreaFragment extends Fragment {
      * 查询市内县，优先数据库，然后服务器
      */
     private void queryCounties(){
+        LogUtil.logInfo("查询县级信息");
         titleText.setText(selectedCity.getCityName());
         backButton.setVisibility(View.VISIBLE);
-        countyList=DataSupport.where("cityid=?",String.valueOf(selectedCity.getId())).find(County.class);
+        countyList=DataSupport.where("cityId = ?",String.valueOf(selectedCity.getId())).find(County.class);
+        LogUtil.logDebug("CityId is :"+selectedCity.getId());
+        LogUtil.logDebug("countyList Size:"+countyList.size());
         if (countyList.size() > 0){
             dataList.clear();
             for (County county : countyList) {
@@ -168,7 +190,8 @@ public class ChooseAreaFragment extends Fragment {
         }else{
             int provinceCode = selectedProvince.getProvinceCode();
             int cityCode = selectedCity.getCityCode();
-            String address = "http://guiolin.tech/api/china/"+provinceCode+"/"+cityCode;
+            String address = "http://guolin.tech/api/china/"+provinceCode+"/"+cityCode;
+//            LogUtil.logDebug(""+);
             queryFromServer(address,"county");
         }
     }
@@ -179,12 +202,16 @@ public class ChooseAreaFragment extends Fragment {
      * @param type
      */
     private void queryFromServer(String address, final String type){
+        LogUtil.logInfo("queryFromServer is Running");
+        LogUtil.logInfo("address ："+address);
+
         showProgressDialog();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             HttpUtil.sendOkHttpRequest(address,new Callback(){
 
                 @Override
                 public void onResponse(Call call, Response response) throws IOException {
+                    LogUtil.logInfo("开始发送网络请求");
                     String responseText = response.body().string();
                     boolean result = false;
                     if ("province".equals(type)){
@@ -211,6 +238,7 @@ public class ChooseAreaFragment extends Fragment {
                     }
                 }
 
+
                 @Override
                 public void onFailure(Call call, IOException e) {
                     getActivity().runOnUiThread(new Runnable() {
@@ -224,6 +252,29 @@ public class ChooseAreaFragment extends Fragment {
             });
         }
     }
+
+
+////    @RequiresApi(api = Build.VERSION_CODES.P)
+//    private void queryFromServer(String address, final String type){
+//        LogUtil.logInfo("queryFromServer is Running");
+//        LogUtil.logInfo("address ："+address);
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+//            HttpUtil.sendOkHttpRequest("http://guolin.tech/api/china", new Callback() {
+//                @Override
+//                public void onFailure(Call call, IOException e) {
+//                    System.out.println("onFailure");
+//                    titleText.setText("Failure");
+//                }
+//
+//                @Override
+//                public void onResponse(Call call, Response response) throws IOException {
+//                    titleText.setText("Response");
+//                    System.out.println("onResponse");
+//                }
+//            });
+//        }
+//
+//    }
 
     /**
      * 开启进度对话框
