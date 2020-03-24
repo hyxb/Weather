@@ -22,6 +22,7 @@ public class City extends DataSupport {
 
     public void setCityName(String cityName) {
         this.cityName = cityName;
+
     }
 
     public int getCityCode() {
