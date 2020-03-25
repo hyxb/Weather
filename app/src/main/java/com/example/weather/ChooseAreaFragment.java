@@ -1,6 +1,7 @@
 package com.example.weather;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -17,6 +18,7 @@ import androidx.viewpager.widget.ViewPager;
 import com.example.weather.db.City;
 import com.example.weather.db.County;
 import com.example.weather.db.Province;
+import com.example.weather.gson.Weather;
 import com.example.weather.util.HttpUtil;
 import com.example.weather.util.LogUtil;
 import com.example.weather.util.Utility;
@@ -94,6 +96,12 @@ public class ChooseAreaFragment extends Fragment {
                 }else if (currentLevel == LEVEL_CITY){
                     selectedCity = cityList.get(position);
                     queryCounties();
+                }else if (currentLevel == LEVEL_COUNTY){
+                    String weather_id = countyList.get(position).getWeatherId();
+                    Intent intent = new Intent(getContext(),WeatherActivity.class);
+                    intent.putExtra("weather_id",weather_id);
+                    startActivity(intent);
+                    getActivity().finish();
                 }
             }
         });
@@ -222,7 +230,7 @@ public class ChooseAreaFragment extends Fragment {
                         result = Utility.handleCountyResponse(responseText,selectedCity.getId());
                     }
                     if (result){
-                        getActivity().runOnUiThread(new Runnable() {
+                        getActivity().runOnUiThread( new Runnable() {
                             @Override
                             public void run() {
                                 closeProgressDialog();
@@ -238,7 +246,6 @@ public class ChooseAreaFragment extends Fragment {
                     }
                 }
 
-
                 @Override
                 public void onFailure(Call call, IOException e) {
                     getActivity().runOnUiThread(new Runnable() {
@@ -253,28 +260,6 @@ public class ChooseAreaFragment extends Fragment {
         }
     }
 
-
-////    @RequiresApi(api = Build.VERSION_CODES.P)
-//    private void queryFromServer(String address, final String type){
-//        LogUtil.logInfo("queryFromServer is Running");
-//        LogUtil.logInfo("address ："+address);
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-//            HttpUtil.sendOkHttpRequest("http://guolin.tech/api/china", new Callback() {
-//                @Override
-//                public void onFailure(Call call, IOException e) {
-//                    System.out.println("onFailure");
-//                    titleText.setText("Failure");
-//                }
-//
-//                @Override
-//                public void onResponse(Call call, Response response) throws IOException {
-//                    titleText.setText("Response");
-//                    System.out.println("onResponse");
-//                }
-//            });
-//        }
-//
-//    }
 
     /**
      * 开启进度对话框
