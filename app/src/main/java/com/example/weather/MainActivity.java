@@ -1,5 +1,6 @@
 package com.example.weather;
 
+import android.graphics.Color;
 import android.os.Build;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
@@ -16,6 +17,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+//        getWindow().setStatusBarColor(Color.parseColor("#FFFFFF"));
         setContentView(R.layout.activity_main);
 
     }
