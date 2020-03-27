@@ -2,22 +2,34 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize">
-    <TextView
-            android:id="@+id/title_city"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:textColor="#fff"
-            android:textSize="20sp"/>
-    <TextView
-            android:id="@+id/title_update_time"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginRight="15dp"
-            android:textColor="#fff"
-            android:layout_alignParentRight="true"
-            android:textSize="16sp"/>
+
+            <ImageButton
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:id="@+id/city_choose_btn"
+                    android:layout_marginLeft="8dp"
+                    android:src="@mipmap/host1"
+                    android:scaleType="fitXY"
+                    android:background="#00000000"
+            />
+
+            <TextView
+                    android:id="@+id/title_city"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:textColor="#fff"
+                    android:textSize="20sp"/>
+
+            <TextView
+                    android:id="@+id/title_update_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginRight="15dp"
+                    android:textColor="#fff"
+                    android:layout_alignParentRight="true"
+                    android:textSize="16sp"/>
 
 
 </RelativeLayout>

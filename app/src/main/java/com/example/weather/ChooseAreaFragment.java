@@ -102,6 +102,7 @@ public class ChooseAreaFragment extends Fragment {
                     intent.putExtra("weather_id",weather_id);
                     startActivity(intent);
                     getActivity().finish();
+                    LogUtil.logError("城市选择结束，根据intent开启新的Activity，传入weather_id");
                 }
             }
         });
